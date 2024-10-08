@@ -5,19 +5,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Key, Copy, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+// Add these new imports
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { createChat } from "@/services/api";
 
 export default function Landing() {
   const [chatLink, setChatLink] = useState("");
   const [copied, setCopied] = useState(false);
+  const [chatLength, setChatLength] = useState("24h");
   const router = useRouter();
 
-  const generateLink = (e: React.FormEvent) => {
+  const generateLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would call an API to generate an encrypted chat link
-    const fakeEncryptedLink = `${window.location.origin}/chat/${Math.random()
-      .toString(36)
-      .substring(7)}`;
-    setChatLink(fakeEncryptedLink);
+    try {
+      const response = await createChat(chatLength);
+      const { id, token } = response;
+      localStorage.setItem("chatToken", token);
+      const generatedLink = `${window.location.origin}/chat/${id}`;
+      setChatLink(generatedLink);
+    } catch (error) {
+      console.error("Error generating chat link:", error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   const copyToClipboard = () => {
@@ -43,20 +58,24 @@ export default function Landing() {
           </p>
         </div>
         <form onSubmit={generateLink} className="mt-8 space-y-6">
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="chat-name" className="sr-only">
-                Chat Name
-              </label>
-              <Input
-                id="chat-name"
-                name="chat-name"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-gray-300 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-gray-700"
-                placeholder="Enter a name for your chat"
-              />
-            </div>
+          <div className="mt-4">
+            <label
+              htmlFor="chat-length"
+              className="block text-sm font-medium text-gray-400 mb-2"
+            >
+              Chat Length
+            </label>
+            <Select onValueChange={setChatLength} defaultValue={chatLength}>
+              <SelectTrigger className="w-full bg-gray-700 text-gray-300 border-gray-600">
+                <SelectValue placeholder="Select chat length" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-700 text-gray-300 border-gray-600">
+                <SelectItem value="1h">1 hour</SelectItem>
+                <SelectItem value="24h">24 hours</SelectItem>
+                <SelectItem value="1w">1 week</SelectItem>
+                <SelectItem value="1m">1 month</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Button
