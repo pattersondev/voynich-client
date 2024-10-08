@@ -7,7 +7,12 @@ import { Lock, Send, Paperclip, Download } from "lucide-react";
 import { getChat } from "@/services/api";
 import { useParams, useRouter } from "next/navigation";
 import io from "socket.io-client";
-import { format } from "date-fns";
+import {
+  format,
+  formatDistanceToNowStrict,
+  differenceInSeconds,
+} from "date-fns";
+import { SOCKET_URL } from "@/services/api";
 
 interface Message {
   id: string;
@@ -28,25 +33,49 @@ export default function ChatRoom({ id }: ChatRoomProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
+  const [timeLeft, setTimeLeft] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [socket, setSocket] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [chatExpired, setChatExpired] = useState(false);
+
+  const formatTimeLeft = (expiresAt: Date) => {
+    const secondsLeft = differenceInSeconds(expiresAt, new Date());
+    if (secondsLeft <= 0) return "Expired";
+
+    const days = Math.floor(secondsLeft / 86400);
+    const hours = Math.floor((secondsLeft % 86400) / 3600);
+    const minutes = Math.floor((secondsLeft % 3600) / 60);
+    const seconds = secondsLeft % 60;
+
+    const parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+
+    return parts.join(" ");
+  };
 
   useEffect(() => {
-    const newSocket = io(
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3005",
-      {
-        withCredentials: true,
-        transports: ["websocket", "polling"],
-      }
-    );
+    console.log("Attempting to connect to socket");
+    const newSocket = io(SOCKET_URL, {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      path: "/socket.io",
+    });
 
     newSocket.on("connect", () => {
-      console.log("Socket connected");
+      console.log("Socket connected successfully");
       newSocket.emit("join", id);
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
     });
 
     newSocket.on("error", (error) => {
@@ -58,37 +87,67 @@ export default function ChatRoom({ id }: ChatRoomProps) {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
+    newSocket.on("chatExpired", () => {
+      console.log("Chat has expired");
+      setChatExpired(true);
+    });
+
     setSocket(newSocket);
 
-    // Fetch initial messages
+    // Fetch initial messages and chat details
     getChat(id)
       .then((chatData) => {
-        setMessages(chatData.messages);
-        setIsLoading(false);
+        if (new Date(chatData.chat.expires_at) < new Date()) {
+          setChatExpired(true);
+        } else {
+          setMessages(chatData.messages);
+          setExpiresAt(new Date(chatData.chat.expires_at));
+          setIsLoading(false);
+        }
       })
       .catch((error) => {
         console.error("Error fetching chat:", error);
+        setChatExpired(true);
         setIsLoading(false);
       });
 
     return () => {
+      console.log("Disconnecting socket");
       newSocket.disconnect();
     };
   }, [id]);
+
+  useEffect(() => {
+    if (expiresAt) {
+      const timer = setInterval(() => {
+        const now = new Date();
+        if (now >= expiresAt) {
+          setTimeLeft("Expired");
+          setChatExpired(true);
+          clearInterval(timer);
+        } else {
+          setTimeLeft(formatTimeLeft(expiresAt));
+        }
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [expiresAt]);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() === "" && !attachment) return;
 
-    console.log("Sending message:", inputMessage);
-    if (socket) {
+    console.log("Attempting to send message:", inputMessage);
+    if (socket && socket.connected) {
       socket.emit("message", {
         chatId: id,
         sender: "You",
         content: inputMessage,
       });
+      console.log("Message emitted to socket");
     } else {
-      console.error("Socket not connected");
+      console.error("Socket not connected. Current socket state:", socket);
     }
 
     setInputMessage("");
@@ -108,13 +167,31 @@ export default function ChatRoom({ id }: ChatRoomProps) {
     }
   }, [messages, isLoading]);
 
+  if (chatExpired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Chat Expired</h1>
+          <p className="text-xl mb-8">This chat no longer exists.</p>
+          <Button
+            onClick={() => router.push("/")}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
+            Return to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <header className="bg-gray-800 p-4 flex items-center justify-center shadow-md h-16">
+      <header className="bg-gray-800 p-4 flex items-center justify-between shadow-md h-16">
         <div className="flex items-center">
           <Lock className="h-6 w-6 text-indigo-400 mr-2" />
-          <h1 className="text-xl font-bold">Voynich - {name}</h1>
+          <h1 className="text-xl font-bold">Voynich</h1>
         </div>
+        <div className="text-sm text-gray-300">Expires in: {timeLeft}</div>
       </header>
       <div
         ref={chatContainerRef}
