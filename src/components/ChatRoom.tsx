@@ -285,6 +285,7 @@ export default function ChatRoom({ id }: ChatRoomProps) {
       <div
         ref={chatContainerRef}
         className="flex-grow overflow-y-auto p-4 space-y-4"
+        style={{ maxHeight: "calc(100vh - 128px)" }} // Adjust height based on header and footer
       >
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
