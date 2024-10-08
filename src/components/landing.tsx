@@ -48,8 +48,8 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden relative">
-      <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl transform transition-all hover:scale-105 relative z-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden relative px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md p-6 sm:p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl transform transition-all hover:scale-105 relative z-10">
         <div className="text-center">
           <Lock className="mx-auto h-12 w-12 text-indigo-400" />
           <h2 className="mt-6 text-3xl font-extrabold text-white">Voynich</h2>
@@ -100,7 +100,7 @@ export default function Landing() {
             >
               Your Encrypted Chat Link
             </label>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
               <div className="relative flex-grow">
                 <Input
                   type="text"
@@ -137,7 +137,7 @@ export default function Landing() {
       </div>
 
       <footer className="mt-8 text-center text-gray-400">
-        <div className="flex justify-center space-x-4">
+        <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
           <Link
             href="/privacy"
             className="flex items-center hover:text-white transition-colors"
