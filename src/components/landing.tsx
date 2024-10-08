@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Lock, Key, Copy, CheckCircle } from "lucide-react";
+import { Lock, Key, Copy, CheckCircle, Shield, Github } from "lucide-react";
 import { useRouter } from "next/navigation";
-// Add these new imports
+import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -48,7 +48,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden relative">
       <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl transform transition-all hover:scale-105 relative z-10">
         <div className="text-center">
           <Lock className="mx-auto h-12 w-12 text-indigo-400" />
@@ -135,6 +135,36 @@ export default function Landing() {
           </div>
         )}
       </div>
+
+      <footer className="mt-8 text-center text-gray-400">
+        <div className="flex justify-center space-x-4">
+          <Link
+            href="/privacy"
+            className="flex items-center hover:text-white transition-colors"
+          >
+            <Shield className="h-4 w-4 mr-1" />
+            Privacy Policy
+          </Link>
+          <a
+            href="https://github.com/pattersondev/voynich-client"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center hover:text-white transition-colors"
+          >
+            <Github className="h-4 w-4 mr-1" />
+            Frontend Source
+          </a>
+          <a
+            href="https://github.com/pattersondev/voynich-backend"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center hover:text-white transition-colors"
+          >
+            <Github className="h-4 w-4 mr-1" />
+            Backend Source
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
