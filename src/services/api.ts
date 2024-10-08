@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3005/api'}`;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}`;
 export const SOCKET_URL = API_BASE_URL.replace('/api', '');
 
 // Create an axios instance with base configuration
