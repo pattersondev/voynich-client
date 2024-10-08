@@ -268,7 +268,7 @@ export default function ChatRoom({ id }: ChatRoomProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden">
       <header className="bg-gray-800 p-4 flex items-center justify-between shadow-md h-16">
         <div className="flex items-center">
           <Lock className="h-6 w-6 text-indigo-400 mr-2" />
