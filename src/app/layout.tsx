@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Voynich - Secure Encrypted Ephemeral Messaging",
     description:
       "Create secure, encrypted, and temporary chat rooms with Voynich.",
-    url: "https://voynich.app",
+    url: "https://voynich.chat",
     siteName: "Voynich",
     images: [
       {
