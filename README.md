@@ -1,8 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Voynich - Secure Ephemeral Messaging
+
+Voynich is a private, secure, and ephemeral messaging application built with [Next.js](https://nextjs.org). It allows users to create temporary, encrypted chat rooms that automatically delete all data after a set period.
+
+## Features
+
+- **Secure Encryption**: All chat contents are securely encrypted, ensuring privacy and confidentiality.
+- **Ephemeral Chats**: Users can set a specific time period for the chat to remain active before all data is permanently deleted.
+- **Link-Based Access**: Chat rooms are accessible only through unique, generated links.
+- **Time-Limited Access**: Once the set time period expires, the chat and all its contents become inaccessible.
+
+## How It Works
+
+1. Users generate a secure chat link with a specified expiration time (e.g., 1 hour, 24 hours, 1 week, or 1 month).
+2. The generated link can be shared with intended participants.
+3. Participants can join the chat using the link while it's active.
+4. All messages and file attachments in the chat are end-to-end encrypted.
+5. Once the set time period expires, the chat and all its data are permanently deleted from the server.
+
+## Security
+
+- The contents of the chat are impossible to access without the chat link while it is live.
+- Even with server access, the encrypted nature of the messages ensures that they remain unreadable.
+- After expiration, all data is securely wiped from the system.
+
+## Backend Code and Security Verification
+
+To verify the security implementation and review the backend code, please visit our backend repository:
+
+[https://github.com/pattersondev/voynich-backend](https://github.com/pattersondev/voynich-backend)
+
+We encourage users and security researchers to review our backend code to ensure transparency and validate our security measures.
 
 ## Getting Started
 
-First, run the development server:
+To run the development server:
 
 ```bash
 npm run dev
@@ -15,22 +46,3 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
